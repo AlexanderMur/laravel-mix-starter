@@ -2,6 +2,9 @@
 const path = require('path')
 const mix = require('laravel-mix')
 const ExtractTextPlugin = require('extract-text-webpack-plugin')
+const autoprefixer = require('autoprefixer')
+
+const fs = require('fs')
 
 const isHMR = process.env.npm_lifecycle_event === 'hot'
 const isWatch = process.env.npm_lifecycle_event === 'development'
@@ -9,8 +12,10 @@ const isBuild = process.env.npm_lifecycle_event === 'build'
 
 // JS files compiling using laravel-mix and react babel presets
 mix.react('src/index.js', 'dist')
-    .setPublicPath('dist')
+
+mix.setPublicPath('dist')
     .setResourceRoot('/dist')
+
 
 /** With this we can extract sass code imported in react components **/
 const rulesConfig = () => {
@@ -27,6 +32,18 @@ const rulesConfig = () => {
                 use: [
                     {
                         loader: 'css-loader',
+                    },
+                    {
+                        loader: 'postcss-loader',
+                        options: {
+
+                            plugins: [
+                                autoprefixer({
+                                    browsers:['ie >= 10', 'last 4 version']
+                                })
+                            ],
+
+                        }
                     },
                     {
                         loader: 'sass-loader',
@@ -54,11 +71,11 @@ mix.webpackConfig({
     devServer: {
         hot: true, // this enables hot reload
         inline: true, // use inline method for hmr
-        port: 8080,
+        disableHostCheck: true,
         headers: {
             'Access-Control-Allow-Origin': '*',
         },
-        contentBase: path.resolve(__dirname, 'public'),
+        contentBase: path.resolve(__dirname, 'dist'),
         watchOptions: {
             exclude: [
                 /bower_components/,
@@ -73,8 +90,8 @@ mix.webpackConfig({
     externals: {
         // require("jquery") is external and available
         //  on the global var jQuery
-        "jquery": "jQuery"
-    }
+        'jquery': 'jQuery',
+    },
     // devtool: 'cheap-module-eval-source-map',
 })
     .sourceMaps()
@@ -107,14 +124,24 @@ if (isBuild) {
 }
 
 if (isWatch) {
-    mix.browserSync()
+    mix.browserSync({
+        proxy: '',
+        files: [
+            'dist/**/*.css',
+            'dist/**/*.js',
+        ],
+        server: {
+            baseDir: './',
+        },
+    })
 }
-mix.browserSync({
-    proxy: '',
-    files: [
-        'dist/**/*.css',
-    ],
-    server: {
-        baseDir: './',
-    },
-})
+
+if (isHMR){
+    fs.writeFileSync("dist/index.css",'')
+    fs.writeFileSync("dist/index.js",`
+(function (url) {
+    var script = document.createElement("script");  // create a script DOM node
+    script.src = url;  // set its src to the provided URL
+    document.head.appendChild(script);  // add it to the end of the head section of the page (could change 'head' to 'body' to add it to the end of the body section instead)
+})('http://localhost:8080/index.js')`)
+}

@@ -6,7 +6,51 @@
     <link rel="stylesheet" href="dist/index.css">
 </head>
 <body>
+<div id="app">
+    <example-component></example-component>
+</div>
 <h1>Hi</h1>
+<!-- Button trigger modal -->
+<button type="button" class="btn btn-primary" data-toggle="modal" data-target="#exampleModal">
+    Launch demo modal
+</button>
+
+<!-- Modal -->
+<div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Modal title</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                ...
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary">Save changes</button>
+            </div>
+        </div>
+    </div>
+</div>
+<p>
+    <i class="fab fa-npm fa-8x"></i>
+    <i class="fa fa-address-card fa-8x"></i>
+    <i class="fab fa-youtube-square fa-8x"></i>
+    <i class="fa fa-arrow-alt-circle-right fa-8x"></i>
+</p>
+<p>
+    <i class="fab fa-vk fa-8x"></i>
+    <i class="fab fa-facebook fa-8x"></i>
+    <i class="fab fa-instagram fa-8x"></i>
+    <i class="fab fa-twitch fa-8x"></i>
+    <i class="fab fa-twitter fa-8x"></i>
+    <i class="fab fa-telegram fa-8x"></i>
+    <i class="fab fa-whatsapp fa-8x"></i>
+</p>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
 <script type="text/javascript" src="dist/index.js"></script>
 </body>
 </html>

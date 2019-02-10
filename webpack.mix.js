@@ -118,7 +118,6 @@ Mix.listen('configReady', (webpackConfig) => {
 })
 
 // Versioning/Cache Busting
-// Version does not work in hmr mode
 if (isBuild) {
     mix.version()
 }

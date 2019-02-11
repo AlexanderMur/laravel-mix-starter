@@ -58,6 +58,7 @@ const rulesConfig = () => {
     return rulesArray
 }
 const output = () => {
+    //fix for dynamic imports s
     if (!isHMR) {
         return {publicPath: 'dist/'}
     }

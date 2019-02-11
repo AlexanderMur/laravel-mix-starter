@@ -11,7 +11,9 @@ const isWatch = process.env.npm_lifecycle_event === 'development'
 const isBuild = process.env.npm_lifecycle_event === 'build'
 
 // JS files compiling using laravel-mix and react babel presets
-mix.react('src/index.js', 'dist')
+mix
+    .react('src/front/index.js', 'dist/front')
+    .react('src/back/index.js', 'dist/back')
 
 mix.setPublicPath('dist')
     .setResourceRoot('/dist')
@@ -39,11 +41,11 @@ const rulesConfig = () => {
 
                             plugins: [
                                 autoprefixer({
-                                    browsers:['ie >= 10', 'last 4 version']
-                                })
+                                    browsers: ['ie >= 10', 'last 4 version'],
+                                }),
                             ],
 
-                        }
+                        },
                     },
                     {
                         loader: 'sass-loader',
@@ -55,7 +57,20 @@ const rulesConfig = () => {
 
     return rulesArray
 }
-
+const output = () => {
+    if (!isHMR) {
+        return {publicPath: 'dist/'}
+    }
+    return {}
+}
+const includeScript = (url) => {
+    return `
+;(function (url) {
+    var script = document.createElement("script");  // create a script DOM node
+    script.src = url;  // set its src to the provided URL
+    document.head.appendChild(script);  // add it to the end of the head section of the page (could change 'head' to 'body' to add it to the end of the body section instead)
+})('` + url + `');`
+}
 // SASS/SCSS webpack loader rules
 // Configure dev server and HMR
 mix.webpackConfig({
@@ -75,7 +90,7 @@ mix.webpackConfig({
         headers: {
             'Access-Control-Allow-Origin': '*',
         },
-        contentBase: path.resolve(__dirname, 'dist'),
+        contentBase: path.resolve(__dirname, ''),
         watchOptions: {
             exclude: [
                 /bower_components/,
@@ -92,7 +107,7 @@ mix.webpackConfig({
         //  on the global var jQuery
         'jquery': 'jQuery',
     },
-    // devtool: 'cheap-module-eval-source-map',
+    output: output(),
 })
     .sourceMaps()
     // Comment this line if you want be notified on every change
@@ -118,8 +133,9 @@ Mix.listen('configReady', (webpackConfig) => {
 })
 
 // Versioning/Cache Busting
-if (isBuild) {
-    mix.version()
+// Version does not work in hmr mode
+if (!isHMR) {
+    mix.version();
 }
 
 if (isWatch) {
@@ -132,15 +148,35 @@ if (isWatch) {
         server: {
             baseDir: './',
         },
+        socket: {
+            domain: 'localhost:3000',
+        },
     })
 }
 
-if (isHMR){
-    fs.writeFileSync("dist/index.css",'')
-    fs.writeFileSync("dist/index.js",`
-(function (url) {
-    var script = document.createElement("script");  // create a script DOM node
-    script.src = url;  // set its src to the provided URL
-    document.head.appendChild(script);  // add it to the end of the head section of the page (could change 'head' to 'body' to add it to the end of the body section instead)
-})('http://localhost:8080/index.js')`)
+//clear css files in hmr mode
+//include hot reload script
+if (isHMR) {
+
+    const cssLinks = [
+        'dist/front/index.css'
+    ]
+
+    const jsLinks = {
+        'dist/front/index.js': 'http://localhost:8080/front/index.js',
+    }
+
+    for (const cssLink of cssLinks) {
+        fs.writeFileSync(cssLink, '')
+    }
+
+    for(const link in jsLinks){
+        const hmrLink = jsLinks[link]
+
+        fs.writeFileSync(link, includeScript(hmrLink))
+    }
+
+    //hot reload images
+    mix.setResourceRoot('http://localhost:8080')
+
 }

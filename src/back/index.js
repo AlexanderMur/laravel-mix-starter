@@ -9,6 +9,7 @@ import './plugins.scss'
 import Vue from 'vue'
 import ExampleComponent from './ExampleComponent'
 
+
 import('./test')
 
 Vue.component(ExampleComponent.name, ExampleComponent);

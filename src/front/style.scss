@@ -1,0 +1,12 @@
+// Global styles for app
+body{
+  background-color: blue;
+  //display: flex;
+  justify-content: center;
+  background-image: url('vectorpaint.svg');
+}
+
+
+::placeholder{
+  color: red
+}
